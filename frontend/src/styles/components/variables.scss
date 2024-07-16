@@ -1,0 +1,17 @@
+$sidebar-text-color: #052C65;
+$sidebar-background-color: #0d6efd;
+$icon-color: #6C757D;
+$diagram-divider-color: #D9D9D9;
+$main-text-color: #6C757D;
+$main-text-active-color: #fff;
+$main-chart-text-color: #290661;
+$modal-text-color: #290661;
+$plus-sign-color: #CED4DA;
+
+@mixin disabled-button {
+  background-color: #e2fed7;
+  cursor: not-allowed !important;
+  border-color: grey;
+  color: grey;
+  pointer-events: all;
+}

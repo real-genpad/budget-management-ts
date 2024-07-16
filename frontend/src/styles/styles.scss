@@ -1,0 +1,218 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import "~bootstrap-icons/font/bootstrap-icons.css";
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import 'components/variables.scss';
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+}
+
+//Общие стили для всех основных страниц (wrapper и заголовок)
+
+.main-wrapper {
+  overflow-x: hidden;
+  padding-top: 100px;
+  padding-left: 60px;
+}
+
+.main-header {
+  font-weight: 500;
+  font-size: 40px;
+  color: $sidebar-text-color;
+  margin-bottom: 40px;
+}
+
+//Общие стили для кнопок с выбором дат на Главной и Доходы и расходы
+
+.diagram-periods {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.diagram-periods .diagram-btn,
+.diagram-periods .date {
+  color: $main-text-color;
+  font-weight: 500;
+}
+
+.diagram-periods .date {
+  width: auto;
+  display: inline-block;
+}
+
+.diagram-periods .diagram-btn.active {
+  color: $main-text-active-color;
+}
+
+.diagram-periods .diagram-btn:hover {
+  color: $main-text-active-color;
+}
+
+.diagram-periods span {
+  font-weight: 500;
+}
+
+.diagram-periods .date {
+  cursor: pointer;
+}
+
+//Общий адаптив для всех основных страниц: wrapper и заголовок, кнопки с выбором дат
+
+@media (max-width: 991px) {
+  .main-wrapper {
+    padding-top: 10px;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .diagram-periods {
+    flex-wrap: wrap;
+    margin-bottom: 70px;
+  }
+
+  .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-wrapper {
+    padding-top: 20px;
+  }
+
+  .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .diagram-periods {
+    margin-bottom: 35px;
+  }
+}
+
+.operations-btn {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+//общие стили для форм создания и редактирования категорий
+
+.form {
+  max-width: 397px;
+}
+
+.form .select,
+.form .input-group {
+  margin-bottom: 10px;
+}
+
+//убираем кастомную стрелочку в селектах
+.form .form-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+  background-color: transparent;
+}
+
+.form .form-select,
+.form .form-control {
+  font-size: 15px;
+}
+
+.form .create-operations {
+  margin-top: 20px; //из-за схлопывания марджинов, сам отступ 10рх
+}
+
+.create-operations .btn.btn-success,
+.card-body .btn.btn-primary{
+  margin-right: 10px;
+}
+
+//общие стили для карточек отдельных страниц доходов и расходов
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cards .card.card-new {
+  cursor: pointer;
+}
+
+.cards .card-body {
+  width: 352px;
+}
+
+.card .card-title {
+  margin-bottom: 10px;
+}
+
+.cards .card-body-new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+.cards .card-body-new span {
+  text-decoration: none;
+  color: $plus-sign-color;
+}
+
+.card .card-title {
+  color: $main-chart-text-color;
+  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+@media (max-width: 1140px) {
+  .main-wrapper.operations-wrapper {
+    text-align: center;
+  }
+
+  .cards {
+    justify-content: space-around;
+  }
+
+  .cards .card-body {
+    width: 300px;
+  }
+
+  .card .card-title {
+    font-size: 20px;
+  }
+
+  .cards .card-body .operations-btn {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 1140px) {
+  .cards .card-body {
+    width: 250px;
+  }
+
+  .card .card-title {
+    font-size: 18px;
+  }
+}
+
+
+@import 'components/sidebar.scss';
+@import 'components/registration.scss';
+@import 'components/main.scss';
+@import 'income-expenses/income-and-expenses.scss';

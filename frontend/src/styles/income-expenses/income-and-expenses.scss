@@ -1,0 +1,78 @@
+@import '../components/variables.scss';
+
+.create-operations {
+  margin-bottom: 40px;
+}
+
+.operations-diagram-periods {
+  margin-bottom: 40px;
+}
+
+.table {
+  text-align: center;
+  font-size: 16px;
+}
+
+.table-responsive hr {
+  border: 1px solid #DEE2E6;
+}
+
+.table-responsive thead th {
+  color: $sidebar-text-color;
+  font-weight: 700;
+}
+
+.table-responsive tbody {
+  vertical-align: middle;
+}
+
+.table-responsive tbody th {
+  font-weight: 700;
+}
+
+.modal .modal-body p {
+  color: $modal-text-color;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.modal .modal-content .modal-footer {
+  border-top: none;
+  justify-content: center;
+}
+
+.modal .modal-content .modal-footer .modal-btn {
+  font-size: 14px;
+}
+
+@media (max-width: 992px) {
+  .table {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal .modal-dialog.modal-dialog-centered {
+    justify-content: center;
+  }
+
+  .modal .modal-content {
+    width: auto;
+  }
+
+  .modal .modal-body p {
+    font-size: 15px;
+  }
+
+  .modal .modal-content .modal-footer .modal-btn {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal .modal-body p {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,27 @@
+@import 'variables.scss';
+
+.form-header {
+  font-weight: 500;
+  color: $sidebar-text-color;
+}
+
+.form-icon {
+  color: $icon-color;
+}
+
+.form-check-label {
+  font-size: 12px
+}
+
+main p {
+  color: #000 !important;
+  font-size: 12px
+}
+
+main p a {
+  font-size: 12px
+}
+
+.process-button:disabled {
+  @include disabled-button;
+}
