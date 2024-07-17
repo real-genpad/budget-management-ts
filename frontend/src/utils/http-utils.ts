@@ -1,13 +1,15 @@
 import config from "../config/config";
 import {AuthUtils} from "./auth-utils";
+import {HttpUtilsResultType} from "../types/http/http-utils.type";
+import {AuthInfoType} from "../types/auth/auth-info.type";
 
 export class HttpUtils {
-    static async request (url: string, method: string = "GET", useAuth: boolean=true, body: any = null){
-        const result = {
+    public static async request (url: string, method: string = "GET", useAuth: boolean =true, body: any = null): Promise<any>{
+        const result: HttpUtilsResultType = {
             error: false,
             response: null
         };
-        const params = {
+        const params: any = {
             method: method,
             headers: {
                 'Content-type': 'application/json',
@@ -15,7 +17,7 @@ export class HttpUtils {
             },
         };
 
-        let token = null;
+        let token: string | AuthInfoType | null = null;
         if(useAuth){
             token = AuthUtils.getAuthInfo(AuthUtils.accessTokenKey);
             if(token){
@@ -27,9 +29,9 @@ export class HttpUtils {
             params.body = JSON.stringify(body)
         }
 
-        let response = null;
+        let response: Response | null = null;
         try{
-            response = await fetch(config.api + url, params)
+            response = await fetch(config.api + url, params);
             result.response = await response.json();
         } catch (e) {
             result.error = true;
@@ -44,7 +46,7 @@ export class HttpUtils {
                     result.redirect = '/login';
                 } else {
                     //2.токен устарел или невалидный
-                    const updateTokenResult = await AuthUtils.updateRefreshToken();
+                    const updateTokenResult: boolean = await AuthUtils.updateRefreshToken();
                     if(updateTokenResult){
                         //запрос повторно
                         return this.request(url, method, useAuth, body);

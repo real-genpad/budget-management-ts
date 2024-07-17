@@ -2,19 +2,13 @@ import {HttpUtils} from "./http-utils";
 import config from "../config/config";
 import {UserInfoType} from "../types/auth/user-info.type";
 import {AuthInfoType} from "../types/auth/auth-info.type";
+import {RefreshResponseType} from "../types/auth/refresh-response.type";
+import {PerformLoginType} from "../types/auth/perfom-login.type";
 
 export class AuthUtils {
-    static accessTokenKey: string = 'accessToken';
-    static refreshTokenKey: string = 'refreshToken';
-    static userInfoTokenKey: string = 'userInfo';
-
-    private static setAuthInfo(accessToken: string, refreshToken:string, userInfo?: UserInfoType): void{
-        localStorage.setItem(this.accessTokenKey, accessToken);
-        localStorage.setItem(this.refreshTokenKey, refreshToken);
-        if(userInfo){
-            localStorage.setItem(this.userInfoTokenKey, JSON.stringify(userInfo));
-        }
-    }
+    public static accessTokenKey: string = 'accessToken';
+    public static refreshTokenKey: string = 'refreshToken';
+    public static userInfoTokenKey: string = 'userInfo';
 
     public static removeAuthInfo(): void{
         localStorage.removeItem(this.accessTokenKey);
@@ -30,7 +24,7 @@ export class AuthUtils {
             const refreshToken: string = localStorage.getItem(this.refreshTokenKey) || '';
             let name: string = localStorage.getItem(this.userInfoTokenKey) || '';
 
-            name = JSON.parse(name);
+            name = (JSON.parse(name) as UserInfoType).name;
             return {
                 accessToken,
                 refreshToken,
@@ -40,7 +34,7 @@ export class AuthUtils {
     }
 
     public static async performLogin(email: string, password: string, rememberMe: boolean): Promise<void> {
-        const result = await HttpUtils.request('/login', 'POST', false, { email, password, rememberMe });
+        const result: PerformLoginType = await HttpUtils.request('/login', 'POST', false, { email, password, rememberMe });
 
         if (result.error || !result.response || (result.response && (!result.response.tokens || !result.response.user))) {
             throw new Error('Login failed');
@@ -53,8 +47,8 @@ export class AuthUtils {
     }
 
     public static async updateRefreshToken(): Promise<boolean>{
-        let result = false;
-        const refreshToken: string | AuthInfoType | null = this.getAuthInfo(this.refreshTokenKey);
+        let result: boolean = false;
+        const refreshToken: AuthInfoType | null = this.getAuthInfo(this.refreshTokenKey) as AuthInfoType | null;
         if(refreshToken){
             const response: Response = await fetch(config.api + '/refresh', {
                 method: 'POST',
@@ -65,8 +59,8 @@ export class AuthUtils {
                 body: JSON.stringify({refreshToken: refreshToken})
             });
             if(response && response.status === 200){
-                const tokens = await response.json();
-                if(tokens && !tokens.error){
+                const tokens: RefreshResponseType | null = await response.json();
+                if(tokens && tokens.tokens && !tokens.error){
                     this.setAuthInfo(tokens.tokens.accessToken, tokens.tokens.refreshToken);
                     result = true;
                 }
@@ -76,5 +70,13 @@ export class AuthUtils {
             this.removeAuthInfo();
         }
         return result;
+    }
+
+    private static setAuthInfo(accessToken: string, refreshToken:string, userInfo?: UserInfoType): void{
+        localStorage.setItem(this.accessTokenKey, accessToken);
+        localStorage.setItem(this.refreshTokenKey, refreshToken);
+        if(userInfo){
+            localStorage.setItem(this.userInfoTokenKey, JSON.stringify(userInfo));
+        }
     }
 }

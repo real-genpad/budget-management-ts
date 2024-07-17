@@ -13,9 +13,9 @@ import {Category} from "./components/category/category";
 import {EditCategory} from "./components/category/edit-category";
 import {DeleteCategory} from "./components/category/delete-category";
 import Modal from 'bootstrap/js/dist/modal.js';
-import {RouteType} from "./types/route.type";
+import {RouteType} from "./types/router/route.type";
 import {AuthInfoType} from "./types/auth/auth-info.type";
-import {UserInfoType} from "./types/auth/user-info.type";
+import {BalanceType} from "./types/router/balance.type";
 
 export class Router {
     readonly titlePageElement: HTMLElement | null;
@@ -27,7 +27,7 @@ export class Router {
     private balanceLink: HTMLElement | null;
     private confirmBalanceBtn: HTMLElement | null;
     private cancelBalanceBtn: HTMLElement | null;
-    private balanceInput: HTMLElement | null;
+    private balanceInput: HTMLInputElement | null;
     private routes: RouteType[];
     private modal: Modal;
 
@@ -231,11 +231,12 @@ export class Router {
     }
 
     private async clickHandler(e: Event): Promise<void> {
-        let element:  = null;
-        if (e.target.nodeName === 'A') {
-            element = e.target;
-        } else if (e.target.parentNode.nodeName === 'A') {
-            element = e.target.parentNode;
+        const target: HTMLAnchorElement = e.target as HTMLAnchorElement;
+        let element: HTMLAnchorElement | null = null;
+        if (target.nodeName === 'A') {
+            element = target;
+        } else if (target.parentNode && target.parentNode.nodeName === 'A') {
+            element = target.parentNode as HTMLAnchorElement;
         }
 
         if (element) {
@@ -249,7 +250,7 @@ export class Router {
         }
     }
 
-    async activateRout(e: Event | null, oldRoute?: string | null | undefined) {
+    private async activateRout(e: Event | null, oldRoute?: string | null | undefined): Promise<void> {
         if (oldRoute) {
             const currentRoute: RouteType | undefined = this.routes.find(item => item.route === oldRoute);
             if (currentRoute && currentRoute.name === 'authorization' && currentRoute.unload && typeof currentRoute.unload === 'function') {
@@ -292,7 +293,7 @@ export class Router {
                             this.balanceLink = document.getElementById("balance-link");
                             this.confirmBalanceBtn = document.getElementById("confirm-balance-btn");
                             this.cancelBalanceBtn = document.getElementById("cancel-balance-btn");
-                            this.balanceInput = document.getElementById("edit-balance");
+                            this.balanceInput = document.getElementById("edit-balance") as HTMLInputElement;
 
                             //вставляем имя пользователя
                             //поля могут быть null, получаем ошибки
@@ -305,10 +306,10 @@ export class Router {
                                 }
                             }
                             if (this.profileNameElement.innerText === '' || this.profileNameElementMenu.innerText === '') {
-                                let userInfo = AuthUtils.getAuthInfo(AuthUtils.userInfoTokenKey);
+                                let userInfo: string | AuthInfoType | null = AuthUtils.getAuthInfo(AuthUtils.userInfoTokenKey);
                                 if (userInfo) {
-                                    if (typeof userInfo === "string") {
-                                        userInfo = JSON.parse(userInfo);
+                                    if(typeof userInfo === 'string') {
+                                        userInfo = JSON.parse(userInfo) as AuthInfoType;
                                     }
                                     if (userInfo && userInfo.name) {
                                         this.profileNameElement.innerText = userInfo.name;
@@ -349,18 +350,18 @@ export class Router {
         } else {
             console.log('requested route was not found');
             history.pushState({}, '', '/');
-            await this.activateRout();
+            await this.activateRout(null);
         }
     }
 
-    isAuthenticated() {
+    private isAuthenticated(): boolean {
         return !!localStorage.getItem('accessToken');
     }
 
-    activateMenuItem(route) {
-        document.querySelectorAll('.sidebar .nav-link, .navbar .nav-link').forEach(item => {
-            const href = item.getAttribute('href');
-            if (route.route === href) {
+    private activateMenuItem(route: RouteType): void {
+        document.querySelectorAll('.sidebar .nav-link, .navbar .nav-link').forEach((item: Element): void => {
+            const href: string | null = item.getAttribute('href');
+            if (route && route.route === href) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');
@@ -368,25 +369,28 @@ export class Router {
         })
     }
 
-    async showBalance() {
-        const result = await HttpUtils.request('/balance');
+    private async showBalance(): Promise<void> {
+        const result: BalanceType = await HttpUtils.request('/balance');
         if (result.redirect) {
             return this.openNewRoute(result.redirect);
         }
         if (result.error || !result.response || (result.response && result.response.error)) {
             return alert('Возникла ошибка при запросе баланса');
         }
-        if (this.balanceElement.innerText === '' || this.balanceElementMenu.innerText === '') {
-            if (result.response.balance) {
-                this.balanceElement.innerText = result.response.balance;
-                this.balanceElementMenu.innerText = result.response.balance;
+        if(this.balanceElement && this.balanceElementMenu) {
+            if (this.balanceElement.innerText === '' || this.balanceElementMenu.innerText === '') {
+                if (result.response.balance && this.balanceElement && this.balanceElementMenu) {
+                    this.balanceElement.innerText = result.response.balance;
+                    this.balanceElementMenu.innerText = result.response.balance;
+                }
             }
         }
     }
 
-    async editBalance() {
-        const result = await HttpUtils.request('/balance', 'PUT', true, {
-            newBalance: this.balanceInput.value
+    private async editBalance(): Promise<void> {
+        const newBalance: string | undefined = this.balanceInput?.value;
+        const result: BalanceType = await HttpUtils.request('/balance', 'PUT', true, {
+            newBalance
         });
         this.modal.hide();
         if (result.redirect) {
@@ -395,7 +399,7 @@ export class Router {
         if (result.error || !result.response || (result.response && result.response.error)) {
             return alert('Возникла ошибка при обновлении баланса');
         }
-        if (result.response.balance) {
+        if (result.response.balance && this.balanceElement && this.balanceElementMenu) {
             this.balanceElement.innerText = result.response.balance;
             this.balanceElementMenu.innerText = result.response.balance;
         }
