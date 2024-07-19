@@ -4,6 +4,8 @@ import {UserInfoType} from "../types/auth/user-info.type";
 import {AuthInfoType} from "../types/auth/auth-info.type";
 import {RefreshResponseType} from "../types/auth/refresh-response.type";
 import {PerformLoginType} from "../types/auth/perfom-login.type";
+import {HttpUtilsResultType} from "../types/http/http-utils.type";
+import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
 
 export class AuthUtils {
     public static accessTokenKey: string = 'accessToken';
@@ -34,18 +36,21 @@ export class AuthUtils {
     }
 
     public static async performLogin(email: string, password: string, rememberMe: boolean): Promise<void> {
-        const result: PerformLoginType = await HttpUtils.request('/login', 'POST', false, { email, password, rememberMe });
+        const result: HttpUtilsResultType<PerformLoginType> = await HttpUtils.request('/login', 'POST', false, { email, password, rememberMe });
 
-        if (result.error || !result.response || (result.response && (!result.response.tokens || !result.response.user))) {
+        const response: DefaultErrorResponseType | PerformLoginType | null = result.response;
+        if (result.error || !response || (response && !(response as PerformLoginType).tokens && !(response as PerformLoginType).user)) {
             throw new Error('Login failed');
         }
 
-        this.setAuthInfo(result.response.tokens.accessToken, result.response.tokens.refreshToken, {
-            id: result.response.user.id,
-            name: result.response.user.name + ' ' + result.response.user.lastName
+        this.setAuthInfo((response as PerformLoginType).tokens.accessToken,
+                         (response as PerformLoginType).tokens.refreshToken, {
+                          id: (response as PerformLoginType).user.id,
+                          name: (response as PerformLoginType).user.name + ' ' + (response as PerformLoginType).user.lastName
         });
     }
 
+    //так как нет такого роута, делаем запрос без шаблона
     public static async updateRefreshToken(): Promise<boolean>{
         let result: boolean = false;
         const refreshToken: AuthInfoType | null = this.getAuthInfo(this.refreshTokenKey) as AuthInfoType | null;
@@ -60,7 +65,7 @@ export class AuthUtils {
             });
             if(response && response.status === 200){
                 const tokens: RefreshResponseType | null = await response.json();
-                if(tokens && tokens.tokens && !tokens.error){
+                if(tokens && tokens.tokens){
                     this.setAuthInfo(tokens.tokens.accessToken, tokens.tokens.refreshToken);
                     result = true;
                 }

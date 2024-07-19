@@ -1,5 +1,5 @@
-export type AuthInfoType = {
-        accessToken: string;
-        refreshToken: string;
+import {TokensType} from "./tokens.type";
+
+export type AuthInfoType = TokensType & {
         name: string;
 }

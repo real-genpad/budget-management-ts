@@ -16,6 +16,8 @@ import Modal from 'bootstrap/js/dist/modal.js';
 import {RouteType} from "./types/router/route.type";
 import {AuthInfoType} from "./types/auth/auth-info.type";
 import {BalanceType} from "./types/router/balance.type";
+import {HttpUtilsResultType} from "./types/http/http-utils.type";
+import {DefaultErrorResponseType} from "./types/default-error-respponse.type";
 
 export class Router {
     readonly titlePageElement: HTMLElement | null;
@@ -369,19 +371,21 @@ export class Router {
         })
     }
 
+    //В http-utils.ts получается: public static async request<BalanceType> (url: string...
     private async showBalance(): Promise<void> {
-        const result: BalanceType = await HttpUtils.request('/balance');
+        const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance');
         if (result.redirect) {
             return this.openNewRoute(result.redirect);
         }
-        if (result.error || !result.response || (result.response && result.response.error)) {
+        const response: DefaultErrorResponseType | BalanceType | null = result.response;
+        if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
             return alert('Возникла ошибка при запросе баланса');
         }
         if(this.balanceElement && this.balanceElementMenu) {
             if (this.balanceElement.innerText === '' || this.balanceElementMenu.innerText === '') {
-                if (result.response.balance && this.balanceElement && this.balanceElementMenu) {
-                    this.balanceElement.innerText = result.response.balance;
-                    this.balanceElementMenu.innerText = result.response.balance;
+                if (response && 'balance' in response && this.balanceElement && this.balanceElementMenu) {
+                    this.balanceElement.innerText = String(response.balance);
+                    this.balanceElementMenu.innerText = String(response.balance);
                 }
             }
         }
@@ -389,19 +393,20 @@ export class Router {
 
     private async editBalance(): Promise<void> {
         const newBalance: string | undefined = this.balanceInput?.value;
-        const result: BalanceType = await HttpUtils.request('/balance', 'PUT', true, {
+        const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance', 'PUT', true, {
             newBalance
         });
         this.modal.hide();
         if (result.redirect) {
             return this.openNewRoute(result.redirect);
         }
-        if (result.error || !result.response || (result.response && result.response.error)) {
+        const response: DefaultErrorResponseType | BalanceType | null = result.response;
+        if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
             return alert('Возникла ошибка при обновлении баланса');
         }
-        if (result.response.balance && this.balanceElement && this.balanceElementMenu) {
-            this.balanceElement.innerText = result.response.balance;
-            this.balanceElementMenu.innerText = result.response.balance;
+        if (response && 'balance' in response && this.balanceElement && this.balanceElementMenu) {
+            this.balanceElement.innerText = String(response.balance);
+            this.balanceElementMenu.innerText = String(response.balance);
         }
     }
 }

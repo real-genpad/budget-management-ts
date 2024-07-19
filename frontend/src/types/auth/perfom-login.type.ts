@@ -1,15 +1,10 @@
-import {HttpUtilsResultType} from "../http/http-utils.type";
+import {TokensType} from "./tokens.type";
 
-export  type  PerformLoginType = HttpUtilsResultType & {
-    tokens?: {
-        "accessToken": string,
-        refreshToken: string
-    },
-    user?: {
+export  type  PerformLoginType = {
+    tokens: TokensType
+    user: {
         name: string,
         lastName: string,
         id: number
-    },
-    error?: boolean,
-    message?: string
+    }
 }
