@@ -1,12 +1,23 @@
 import {AuthUtils} from "../utils/auth-utils";
 import {HttpUtils} from "../utils/http-utils";
+import {SignupFieldType} from "../types/login-signup/signup-field.type";
+import {HttpUtilsResultType} from "../types/http/http-utils.type";
+import {SignupResponseType} from "../types/login-signup/signup-response.type";
+import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
 
 export class SignUp {
-    constructor(openNewRoute) {
+    readonly openNewRoute: (url: string) => Promise<void>;
+    private fields: SignupFieldType[] = [];
+    readonly commonErrorElement: HTMLElement | null = null;
+    readonly passwordElement: HTMLInputElement | null = null;
+    readonly processElement: HTMLElement | null = null;
+
+    constructor(openNewRoute: (url: string) => Promise<void>) {
         this.openNewRoute = openNewRoute;
 
         if(AuthUtils.getAuthInfo(AuthUtils.accessTokenKey)){
-            return this.openNewRoute('/');
+            this.openNewRoute('/');
+            return;
         }
 
         this.fields = [
@@ -35,33 +46,36 @@ export class SignUp {
                 name: 'repeatPassword',
                 id: 'password-repeat',
                 element: null,
+                regex: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
                 valid: false
             },
         ]
 
         this.commonErrorElement = document.getElementById('common-error');
-        this.passwordElement = document.getElementById('password')
+        this.passwordElement = document.getElementById('password') as HTMLInputElement;
         this.processElement = document.getElementById('process-button');
 
         this.init();
-        this.processElement.addEventListener('click', this.signUp.bind(this));
+        if(this.processElement) {
+            this.processElement.addEventListener('click', this.signUp.bind(this));
+        }
     }
 
     //запускаем валидацию формы
-    init(){
-        const that = this;
-        this.fields.forEach(item => {
-            item.element = document.getElementById(item.id);
+    private init(){
+        const that: SignUp = this;
+        this.fields.forEach((item: SignupFieldType): void => {
+            item.element = document.getElementById(item.id) as HTMLInputElement;
             item.element.onchange = function(){
-              that.validateField.call(that, item, this);
+              that.validateField.call(that, item, <HTMLInputElement>this);
             }
         });
     }
 
     //валидируем каждое поле
-    validateField(field, element) {
+    private validateField(field: SignupFieldType, element: HTMLInputElement): void {
         // проверка, что поле повторения пароля совпадает с полем пароля
-        if (field.name === 'repeatPassword') {
+        if (field.name === 'repeatPassword' && this.passwordElement && element.previousElementSibling instanceof HTMLElement) {
             if (element.value !== this.passwordElement.value) {
                 element.classList.add('is-invalid');
                 element.previousElementSibling.style.borderColor = 'red';
@@ -73,57 +87,68 @@ export class SignUp {
             }
         } else {
             // Валидация остальных полей
-            if (!element.value || !element.value.match(field.regex)) {
-                element.classList.add('is-invalid');
-                element.previousElementSibling.style.borderColor = 'red';
-                field.valid = false;
-            } else {
-                element.classList.remove('is-invalid');
-                element.previousElementSibling.removeAttribute('style');
-                field.valid = true;
+            if(element.previousElementSibling instanceof HTMLElement){
+                if (!element.value || !element.value.match(field.regex)) {
+                    element.classList.add('is-invalid');
+                    element.previousElementSibling.style.borderColor = 'red';
+                    field.valid = false;
+                } else {
+                    element.classList.remove('is-invalid');
+                    element.previousElementSibling.removeAttribute('style');
+                    field.valid = true;
+                }
             }
         }
         this.validateForm();
     }
 
     //если все поля валидны, разблокируем кнопку
-    validateForm() {
-        const validForm = this.fields.every(item => item.valid);
-        if(validForm){
-            this.processElement.removeAttribute('disabled');
-        } else {
-            this.processElement.setAttribute('disabled', 'disabled');
+    private validateForm(): boolean {
+        const validForm: boolean = this.fields.every((item: SignupFieldType) => item.valid);
+        if(this.processElement) {
+            if(validForm){
+                this.processElement.removeAttribute('disabled');
+            } else {
+                this.processElement.setAttribute('disabled', 'disabled');
+            }
         }
         return validForm;
     }
 
-    async signUp (){
-        this.commonErrorElement.style.display = 'none';
+    private async signUp (): Promise<void> {
+        if(this.commonErrorElement) {
+            this.commonErrorElement.style.display = 'none';
+        }
         if (this.validateForm()) {
             try{
-                const result = await HttpUtils.request('/signup', 'POST', false, {
-                    name: this.fields.find(item => item.name === 'name').element.value.split(' ')[0],
-                    lastName: this.fields.find(item => item.name === 'name').element.value.split(' ')[1],
-                    email: this.fields.find(item => item.name === 'email').element.value,
-                    password: this.fields.find(item => item.name === 'password').element.value,
-                    passwordRepeat: this.fields.find(item => item.name === 'repeatPassword').element.value
+                const result: HttpUtilsResultType<SignupResponseType> = await HttpUtils.request('/signup', 'POST', false, {
+                    name: this.fields.find((item: SignupFieldType): boolean => item.name === 'name')?.element?.value.split(' ')[0],
+                    lastName: this.fields.find((item: SignupFieldType): boolean => item.name === 'name')?.element?.value.split(' ')[1],
+                    email: this.fields.find((item: SignupFieldType): boolean => item.name === 'email')?.element?.value,
+                    password: this.fields.find((item: SignupFieldType): boolean => item.name === 'password')?.element?.value,
+                    passwordRepeat: this.fields.find((item: SignupFieldType): boolean => item.name === 'repeatPassword')?.element?.value
                 });
 
-                if (result.error || !result.response || (result.response && !result.response.user)) {
+                const response: DefaultErrorResponseType |SignupResponseType | null = result.response;
+                if (result.error || !response || (response && !(response as SignupResponseType).user)) {
                     throw new Error('Login failed');
                 }
             } catch (error) {
-                this.commonErrorElement.style.display = 'block';
+                if(this.commonErrorElement) {
+                    this.commonErrorElement.style.display = 'block';
+                }
             }
 
             try {
                 await AuthUtils.performLogin(
-                    this.fields.find(item => item.name === 'email').element.value,
-                    this.fields.find(item => item.name === 'password').element.value
+                    this.fields.find((item: SignupFieldType): boolean => item.name === 'email')?.element?.value as string,
+                    this.fields.find((item: SignupFieldType): boolean => item.name === 'password')?.element?.value as string
                 );
                 this.openNewRoute('/');
             } catch (error) {
-                this.commonErrorElement.style.display = 'block';
+                if(this.commonErrorElement) {
+                    this.commonErrorElement.style.display = 'block';
+                }
             }
         }
     }

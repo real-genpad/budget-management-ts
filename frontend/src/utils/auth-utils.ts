@@ -5,7 +5,6 @@ import {AuthInfoType} from "../types/auth/auth-info.type";
 import {RefreshResponseType} from "../types/auth/refresh-response.type";
 import {PerformLoginType} from "../types/auth/perfom-login.type";
 import {HttpUtilsResultType} from "../types/http/http-utils.type";
-import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
 
 export class AuthUtils {
     public static accessTokenKey: string = 'accessToken';
@@ -35,18 +34,18 @@ export class AuthUtils {
         }
     }
 
-    public static async performLogin(email: string, password: string, rememberMe: boolean): Promise<void> {
+    public static async performLogin(email: string, password: string, rememberMe?: boolean): Promise<void> {
         const result: HttpUtilsResultType<PerformLoginType> = await HttpUtils.request('/login', 'POST', false, { email, password, rememberMe });
 
-        const response: DefaultErrorResponseType | PerformLoginType | null = result.response;
-        if (result.error || !response || (response && !(response as PerformLoginType).tokens && !(response as PerformLoginType).user)) {
+        const response: PerformLoginType = result.response as PerformLoginType;
+        if (result.error || !response || (response && !response.tokens && !response.user)) {
             throw new Error('Login failed');
         }
 
-        this.setAuthInfo((response as PerformLoginType).tokens.accessToken,
-                         (response as PerformLoginType).tokens.refreshToken, {
-                          id: (response as PerformLoginType).user.id,
-                          name: (response as PerformLoginType).user.name + ' ' + (response as PerformLoginType).user.lastName
+        this.setAuthInfo(response.tokens.accessToken,
+                         response.tokens.refreshToken, {
+                          id: response.user.id,
+                          name: response.user.name + ' ' + response.user.lastName
         });
     }
 

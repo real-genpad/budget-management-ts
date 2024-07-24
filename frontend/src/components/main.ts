@@ -1,59 +1,72 @@
 import {DateFilter} from "../services/date-filter";
 import {HttpUtils} from "../utils/http-utils";
 import Chart from 'chart.js/auto';
+import {HttpUtilsResultType} from "../types/http/http-utils.type";
+import {DateFilterType} from "../types/date-filter/date-filter.type";
+import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
+import {ChartDataType} from "../types/chart/chart-data.type";
 
 export class Main {
-    constructor(openNewRoute) {
+    readonly openNewRoute: (url: string) => Promise<void>;
+    private incomeChart: Chart<"pie", number[], string> | null;
+    private expensesChart: Chart<"pie", number[], string> | null;
+
+    constructor(openNewRoute: (url: string) => Promise<void>) {
         this.openNewRoute = openNewRoute;
+        this.incomeChart = null;
+        this.expensesChart = null;
         this.getOperations('all').then();
         new DateFilter(this.getOperations.bind(this));
     }
 
-    async getOperations(period, dateFrom = '', dateTo = '') {
-        let url = '/operations?period=all';
+    private async getOperations(period: string, dateFrom: string = '', dateTo: string = ''): Promise<void> {
+        let url: string = '/operations?period=all';
         if (period !== 'all') {
             url = '/operations?period=interval&dateFrom=' + dateFrom + '&dateTo=' + dateTo;
         }
-        const result = await HttpUtils.request(url);
+        const result: HttpUtilsResultType<DateFilterType[]> = await HttpUtils.request(url);
         if (result.redirect) {
             return this.openNewRoute(result.redirect);
         }
-        if (result.error || !result.response || (result.response && result.response.error)) {
+
+        const response: DateFilterType[] | DefaultErrorResponseType | null = result.response;
+        if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
             return alert('Возникла ошибка при запросе операций');
         }
-        this.loadOperationsIntoChart(result.response);
+        this.loadOperationsIntoChart(result.response as DateFilterType[]);
     }
 
-    loadOperationsIntoChart(operations) { //загружаем данные по операциям в чарты
-        const incomeData = this.getDataByType(operations, 'income'); //сюда размещаем доходы
-        const expensesData = this.getDataByType(operations, 'expense'); //сюда размещаем расходы
+    private loadOperationsIntoChart(operations: DateFilterType[]): void { //загружаем данные по операциям в чарты
+        const incomeData: ChartDataType = this.getDataByType(operations, 'income');
+        const expensesData: ChartDataType = this.getDataByType(operations, 'expense');
 
         this.renderCharts(incomeData, expensesData); //создаем и обновляем данные в чартах
     }
 
-    getDataByType(operations, type) { //фильтруем операции по типу
-        const filteredOperations = operations.filter(operation => operation.type === type); //создаем массив, в который попадают операции с соответствующим типом
-        const categoriesSum = {}; //тут будем хранить категории с суммами
+    private getDataByType(operations: DateFilterType[], type: string): ChartDataType { //фильтруем операции по типу
+        const filteredOperations: DateFilterType[] = operations.filter((operation: DateFilterType): boolean => operation.type === type); //создаем массив, в который попадают операции с соответствующим типом
+        const categoriesSum: { [key: string]: number } = {}; //тут будем хранить категории с суммами
 
-        filteredOperations.forEach(operation => { //проходим по каждой отфильтрованной операции
-            if (!categoriesSum[operation.category]) { //проверяем наличие категории в объекте categories, обращаемся к свойству category текущей операции
-                categoriesSum[operation.category] = 0; //если категории еще нет, то создаем ее с суммой 0
+        filteredOperations.forEach((operation: DateFilterType): void => {
+            if (typeof categoriesSum[operation.category] === 'number') {
+                categoriesSum[operation.category] += operation.amount;
+            } else {
+                categoriesSum[operation.category] = operation.amount;
             }
-            categoriesSum[operation.category] += parseFloat(operation.amount); //добавляем сумму текущей операции к значению этой категории в объекте categories.
         });
         //console.log(categoriesSum);
 
         //извлекаем ключи и значения из объекта categories, задаем цвета для графиков:
-        const labels = Object.keys(categoriesSum);
-        const data = Object.values(categoriesSum);
-        const backgroundColor = ['#DC3545', '#FD7E14', '#FFC107', '#20C997', '#0D6EFD'];
+        const labels: string[] = Object.keys(categoriesSum);
+        const data: number[] = Object.values(categoriesSum);
+        const backgroundColor: string[] = ['#DC3545', '#FD7E14', '#FFC107', '#20C997', '#0D6EFD'];
 
         return { labels, data, backgroundColor }; //возвращаем объект с этими данными
     }
 
-    renderCharts(incomeData, expensesData) { //отрисовываем чарты
-        const incomeChartCanvas = document.getElementById('chart-income');
-        const expensesChartCanvas = document.getElementById('chart-expenses');
+    private renderCharts(incomeData: ChartDataType, expensesData: ChartDataType): void { //отрисовываем чарты
+        const incomeChartCanvas: HTMLCanvasElement = document.getElementById('chart-income') as HTMLCanvasElement;
+        const expensesChartCanvas: HTMLCanvasElement = document.getElementById('chart-expenses') as HTMLCanvasElement;
 
         //удаляем существующие чарты, если они есть, чтобы фильтр обновлял данные
         if (this.incomeChart) {

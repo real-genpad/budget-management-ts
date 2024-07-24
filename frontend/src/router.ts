@@ -60,9 +60,9 @@ export class Router {
             },
             {
                 name: 'authorization',
-                route: '/login',
+                route: '/login-signup',
                 title: 'Авторизация',
-                filePathTemplate: '/templates/login.html',
+                filePathTemplate: '/templates/login-signup.html',
                 requiresAuth: false,
                 load: () => {
                     document.body.classList.add('d-flex', 'justify-content-center', 'align-items-center', 'vh-100');
