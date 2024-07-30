@@ -1,11 +1,12 @@
 import {AuthUtils} from "../utils/auth-utils";
 import {HttpUtils} from "../utils/http-utils";
-import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
+import {DefaultErrorResponseType} from "../types/http/default-error-respponse.type";
+import {OpenRouteType} from "../types/router/open-route.type";
 
 export class Logout {
-    readonly openNewRoute: (url: string) => Promise<void>;
+    readonly openNewRoute: OpenRouteType;
 
-    constructor(openNewRoute: (url: string) => Promise<void>) {
+    constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
 
         if (!AuthUtils.getAuthInfo(AuthUtils.accessTokenKey) || !AuthUtils.getAuthInfo(AuthUtils.refreshTokenKey)) {

@@ -1,18 +1,21 @@
+import {CalculateDatesType} from "../types/date-filter/calculate-dates.type";
+import {DateFilterType} from "../types/date-filter/date-filter.type";
+
 export class DateFilter { //отвечает за выбор периода и интервалов дат
-    readonly getOperations: (period: string, dateFrom: string, dateTo: string) => Promise<void>;
+    readonly getOperations: DateFilterType;
     private periodButtons: NodeListOf<Element>;
     readonly startDatePicker: HTMLInputElement | null;
     readonly endDatePicker: HTMLInputElement | null;
 
-    constructor(getOperations: (period: string, dateFrom: string, dateTo: string) => Promise<void>) {
+    constructor(getOperations: DateFilterType) {
         this.getOperations = getOperations; //при изменении фильтра делает новый запрос на сервер(метод из файла income-expenses.ts)
         this.periodButtons = document.querySelectorAll('.diagram-btn');
         this.startDatePicker = document.getElementById('start-date') as HTMLInputElement;
         this.endDatePicker = document.getElementById('end-date') as HTMLInputElement;
-        this.startDatePicker.addEventListener('focus', () => {
+        this.startDatePicker.addEventListener('focus', (): void => {
             (this.startDatePicker as HTMLInputElement).setAttribute('type', 'date');
         });
-        this.endDatePicker.addEventListener('focus', () => {
+        this.endDatePicker.addEventListener('focus', (): void => {
             (this.endDatePicker as HTMLInputElement).setAttribute('type', 'date');
         });
         this.initButtonsListeners();
@@ -49,7 +52,7 @@ export class DateFilter { //отвечает за выбор периода и �
         this.getOperations(period, dateFrom, dateTo); //передаем полученные данные для запроса при изменении фильтра
     }
 
-    private calculateDates(period: string): { dateFrom: string, dateTo: string } { //вычисляем периоды для фильтра
+    private calculateDates(period: string): CalculateDatesType { //вычисляем периоды для фильтра
         let dateFrom: string = '';
         let dateTo: string = '';
         const today: Date = new Date();

@@ -1,0 +1,57 @@
+<div class="main-wrapper">
+    <h1 class="main-header income-and-expenses-header h3">Доходы и расходы</h1>
+
+    <div class="create-operations">
+        <a href="/income-and-expenses-create?type=income" id="create-income" role="button" class="operations-btn btn btn-success">Создать доход</a>
+        <a href="/income-and-expenses-create?type=expense" id="create-expense" role="button" class="operations-btn btn btn-danger">Создать расход</a>
+    </div>
+
+    <div class="operations-diagram-periods diagram-periods d-flex gap-3 align-items-center">
+        <button type="button" class="diagram-btn btn btn-outline-secondary active" data-period="today">Сегодня</button>
+        <button type="button" class="diagram-btn btn btn-outline-secondary" data-period="week">Неделя</button>
+        <button type="button" class="diagram-btn btn btn-outline-secondary" data-period="month">Месяц</button>
+        <button type="button" class="diagram-btn btn btn-outline-secondary" data-period="year">Год</button>
+        <button type="button" class="diagram-btn btn btn-outline-secondary" data-period="all">Все</button>
+        <p role="button" class="diagram-btn btn btn-outline-secondary m-0" data-period="interval">Интервал</p>
+        <span>с</span>
+        <input type="text" size="3" id="start-date" name="start" placeholder="Дата" class="date text-decoration-underline border-0">
+        <span>по</span>
+        <input type="text" size="3" id="end-date" name="start" placeholder="Дата" class="date text-decoration-underline border-0">
+    </div>
+
+    <div class="table-responsive overflow-auto" >
+        <hr>
+        <table class="table table-hover" id="data=table">
+            <thead>
+            <tr>
+                <th scope="col">№ операции</th>
+                <th scope="col">Тип</th>
+                <th scope="col">Категория</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Дата</th>
+                <th scope="col">Комментарий</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody id="records">
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+             style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" id="modal">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p>Вы действительно хотите удалить операцию?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="javascript:void(0)" id="delete-btn" role="button" class="modal-btn btn btn-success"
+                           data-bs-dismiss="modal">Да, удалить</a>
+                        <a href="javascript:void(0)" role="button" class="modal-btn btn btn-danger"
+                           data-bs-dismiss="modal">Не удалять</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -38,7 +38,7 @@ module.exports = {
         },
         liveReload: true,
         compress: true,
-        port: 9000,
+        port: 8080,
         historyApiFallback: true,
     },
     plugins: [

@@ -1,14 +1,15 @@
 import {AuthUtils} from "../utils/auth-utils";
 import {LoginFieldType} from "../types/login-signup/login-field.type";
+import {OpenRouteType} from "../types/router/open-route.type";
 
 export class Login {
-    readonly openNewRoute: (url: string) => Promise<void>;
+    readonly openNewRoute: OpenRouteType;
     private fields: LoginFieldType[] = []; //инициализируем сразу, так как вначале конструктора есть return,
     readonly commonErrorElement: HTMLElement | null = null; // а, значит, эти переменные могут остаться неинициализированными
     private rememberMeElement: HTMLInputElement | null = null;
     readonly processElement: HTMLElement | null = null;
 
-    constructor(openNewRoute: (url: string) => Promise<void>) {
+    constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
 
         if(AuthUtils.getAuthInfo(AuthUtils.accessTokenKey)){

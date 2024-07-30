@@ -17,7 +17,7 @@ import {RouteType} from "./types/router/route.type";
 import {AuthInfoType} from "./types/auth/auth-info.type";
 import {BalanceType} from "./types/router/balance.type";
 import {HttpUtilsResultType} from "./types/http/http-utils.type";
-import {DefaultErrorResponseType} from "./types/default-error-respponse.type";
+import {DefaultErrorResponseType} from "./types/http/default-error-respponse.type";
 
 export class Router {
     readonly titlePageElement: HTMLElement | null;

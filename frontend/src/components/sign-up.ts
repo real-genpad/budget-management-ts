@@ -3,16 +3,17 @@ import {HttpUtils} from "../utils/http-utils";
 import {SignupFieldType} from "../types/login-signup/signup-field.type";
 import {HttpUtilsResultType} from "../types/http/http-utils.type";
 import {SignupResponseType} from "../types/login-signup/signup-response.type";
-import {DefaultErrorResponseType} from "../types/default-error-respponse.type";
+import {DefaultErrorResponseType} from "../types/http/default-error-respponse.type";
+import {OpenRouteType} from "../types/router/open-route.type";
 
 export class SignUp {
-    readonly openNewRoute: (url: string) => Promise<void>;
+    readonly openNewRoute: OpenRouteType;
     private fields: SignupFieldType[] = [];
     readonly commonErrorElement: HTMLElement | null = null;
     readonly passwordElement: HTMLInputElement | null = null;
     readonly processElement: HTMLElement | null = null;
 
-    constructor(openNewRoute: (url: string) => Promise<void>) {
+    constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
 
         if(AuthUtils.getAuthInfo(AuthUtils.accessTokenKey)){
