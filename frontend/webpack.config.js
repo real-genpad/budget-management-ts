@@ -28,7 +28,7 @@ module.exports = {
     },
     cache: false,
     output: {
-        filename: 'app.ts',
+        filename: 'app.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true
     },

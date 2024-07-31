@@ -12,7 +12,7 @@ import {CreateCategory} from "./components/category/create-category";
 import {Category} from "./components/category/category";
 import {EditCategory} from "./components/category/edit-category";
 import {DeleteCategory} from "./components/category/delete-category";
-import Modal from 'bootstrap/js/dist/modal.js';
+import {Modal} from 'bootstrap';
 import {RouteType} from "./types/router/route.type";
 import {AuthInfoType} from "./types/auth/auth-info.type";
 import {BalanceType} from "./types/router/balance.type";
@@ -30,8 +30,8 @@ export class Router {
     private confirmBalanceBtn: HTMLElement | null;
     private cancelBalanceBtn: HTMLElement | null;
     private balanceInput: HTMLInputElement | null;
-    private routes: RouteType[];
-    private modal: Modal;
+    readonly routes: RouteType[];
+    private modal: Modal | null = null;
 
     constructor() {
         this.initEvents();
@@ -45,7 +45,6 @@ export class Router {
         this.confirmBalanceBtn = null;
         this.cancelBalanceBtn = null;
         this.balanceInput = null;
-        this.modal = new Modal('#balanceModal');
         this.routes = [
             {
                 name: 'content',
@@ -321,16 +320,24 @@ export class Router {
                             }
                             await this.showBalance();
 
+                            if(!this.modal) {
+                                this.modal = new Modal('#balanceModal');
+                            }
+
                             //открываем модальное окно при нажатии на ссылку "Баланс"
                             this.balanceLink.addEventListener("click", () => {
-                                this.modal.show();
+                                if(this.modal) {
+                                    this.modal.show();
+                                }
                             });
                             //закрываем модальное окно при нажатии на кнопку "Отменить"
                             this.cancelBalanceBtn.addEventListener("click", () => {
                                 if(this.balanceInput){
                                     this.balanceInput.value = ''; // Сбросить значение инпута
                                 }
-                                this.modal.hide();
+                                if(this.modal) {
+                                    this.modal.hide();
+                                }
                             });
                             //обновляем баланс
                             this.confirmBalanceBtn.addEventListener('click', this.editBalance.bind(this));
@@ -396,7 +403,9 @@ export class Router {
         const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance', 'PUT', true, {
             newBalance
         });
-        this.modal.hide();
+        if(this.modal) {
+            this.modal.hide();
+        }
         if (result.redirect) {
             return this.openNewRoute(result.redirect);
         }

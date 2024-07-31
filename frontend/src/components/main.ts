@@ -46,7 +46,7 @@ export class Main {
 
     private getDataByType(operations: OperationsType[], type: string): ChartDataType { //фильтруем операции по типу
         const filteredOperations: OperationsType[] = operations.filter((operation: OperationsType): boolean => operation.type === type); //создаем массив, в который попадают операции с соответствующим типом
-        const categoriesSum: { [key: string]: number } = {}; //тут будем хранить категории с суммами
+        const categoriesSum: Record<string, number> = {}; //тут будем хранить категории с суммами
 
         filteredOperations.forEach((operation: OperationsType): void => {
             if (typeof categoriesSum[operation.category] === 'number') {
