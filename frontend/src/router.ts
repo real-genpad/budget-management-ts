@@ -59,9 +59,9 @@ export class Router {
             },
             {
                 name: 'authorization',
-                route: '/login-signup',
+                route: '/login',
                 title: 'Авторизация',
-                filePathTemplate: '/templates/login-signup.html',
+                filePathTemplate: '/templates/login.html',
                 requiresAuth: false,
                 load: () => {
                     document.body.classList.add('d-flex', 'justify-content-center', 'align-items-center', 'vh-100');
@@ -223,12 +223,19 @@ export class Router {
         window.addEventListener('DOMContentLoaded', this.activateRout.bind(this));
         window.addEventListener('popstate', this.activateRout.bind(this));
         document.addEventListener('click', this.clickHandler.bind(this));
+
+        // обработчик для выпадающего списка
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', () => {
+                dropdown.classList.toggle('active');
+            });
+        });
     }
 
     public async openNewRoute(url: string): Promise<void> {
         const currentRoute: string = window.location.pathname;
         history.pushState({}, '', url);
-            await this.activateRout(null, currentRoute);
+        await this.activateRout(null, currentRoute);
     }
 
     private async clickHandler(e: Event): Promise<void> {
@@ -396,6 +403,37 @@ export class Router {
                 }
             }
         }
+
+        // Инициализация модального окна
+        // if (!this.modal) {
+        //     this.modal = new Modal('#balanceModal');
+        //     console.log('Modal initialized:', this.modal);
+        // }
+        //
+        // // События для модального окна
+        // (this.balanceLink as HTMLElement).addEventListener("click", () => {
+        //     if (this.modal) {
+        //         this.modal.show();
+        //         console.log('Modal shown');
+        //     }
+        // });
+        //
+        // (this.cancelBalanceBtn as HTMLElement).addEventListener("click", () => {
+        //     if (this.balanceInput) {
+        //         this.balanceInput.value = ''; // Сбросить значение инпута
+        //     }
+        //     if (this.modal) {
+        //         this.modal.hide();
+        //         console.log('Modal hidden');
+        //     }
+        // });
+        //
+        // (this.confirmBalanceBtn as HTMLElement).addEventListener('click', this.editBalance.bind(this));
+        //
+        // // Очистка событий для выпадающих меню
+        // document.querySelectorAll('.dropdown-toggle').forEach(el => {
+        //     el.removeEventListener('click', this.dropdownClickHandler);
+        // });
     }
 
     private async editBalance(): Promise<void> {

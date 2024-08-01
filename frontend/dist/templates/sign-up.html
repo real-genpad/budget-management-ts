@@ -1,0 +1,55 @@
+<main class="form-signup col-xl-3 col-lg-4 col-md-7 col-sm-10 mx-auto">
+    <form>
+        <div class="login-logo text-center"><a><img class="mb-4" src="/images/Logo.png" alt="Logo"></a>
+        </div>
+        <h1 class="form-header h1 mb-4 mt-4 text-center">Создайте аккаунт</h1>
+        <div class="invalid-feedback text-center mb-2" id="common-error">Не удалось зарегистрировать пользователя.
+            Обратитесь в поддержку
+        </div>
+        <div class="input-group mb-2">
+                <span class="input-group-text" id="basic-addon">
+                  <i class="form-icon bi bi-person"></i>
+                </span>
+            <input type="text" class="form-control" placeholder="ФИО" aria-label="Input group example"
+                   aria-describedby="basic-addon" id="name">
+            <div id="name-error" class="invalid-feedback">
+                Введите корректные имя и фамилию с заглавной буквы
+            </div>
+        </div>
+        <div class="input-group mb-2">
+                <span class="input-group-text" id="basic-addon1">
+                  <i class="form-icon bi-envelope-open"></i>
+                </span>
+            <input type="email" class="form-control" placeholder="Электронная почта" aria-label="Input group example"
+                   aria-describedby="basic-addon1" id="email">
+            <div id="email-error" class="invalid-feedback">
+                Введите корректный адрес электронной почты
+            </div>
+        </div>
+        <div class="input-group mb-2">
+                <span class="input-group-text" id="basic-addon2">
+                  <i class="form-icon bi bi-lock"></i>
+                </span>
+            <input type="password" class="form-control" placeholder="Пароль" aria-label="Input group example"
+                   aria-describedby="basic-addon2" id="password">
+            <div id="password-error" class="invalid-feedback">
+                Пароль должен имень от 8 до 16 символов и содержать одну цифру, заглавную букву, знак препинания
+                или математические(специальные символы)
+            </div>
+        </div>
+        <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon3">
+                  <i class="form-icon bi bi-lock"></i>
+                </span>
+            <input type="password" class="form-control" placeholder="Подтверждение пароля"
+                   aria-label="Input group example"
+                   aria-describedby="basic-addon3" id="password-repeat">
+            <div id="password-repeat-error" class="invalid-feedback">
+                Пароли должны совпадать
+            </div>
+        </div>
+        <button class="process-button btn btn-primary w-100 py-2" type="button" id="process-button" disabled>Войти
+        </button>
+    </form>
+    <p class="mt-2 mb-2">Уже есть аккаунт? <a href="/login">Войдите в систему</a></p>
+</main>
