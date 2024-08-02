@@ -10,13 +10,11 @@ export class CustomModal {
     readonly inputElement: HTMLInputElement;
     private confirmButton: HTMLButtonElement;
     private cancelButton: HTMLButtonElement;
-    readonly balanceElementMenu: HTMLInputElement;
 
     constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
         this.modalElement = document.getElementById('customModal') as HTMLElement;
         this.inputElement = document.getElementById('edit-balance') as HTMLInputElement;
-        this.balanceElementMenu = document.getElementById('balance-menu') as HTMLInputElement;
         this.confirmButton = document.getElementById('confirm-balance-btn') as HTMLButtonElement;
         this.cancelButton = document.getElementById('cancel-balance-btn') as HTMLButtonElement;
 
@@ -57,7 +55,6 @@ export class CustomModal {
         }
         if (response && 'balance' in response && this.inputElement) {
             this.inputElement.innerText = String(response.balance);
-            this.balanceElementMenu.innerText = String(response.balance);
         }
     }
 }
