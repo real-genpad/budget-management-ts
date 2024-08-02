@@ -18,6 +18,7 @@ import {AuthInfoType} from "./types/auth/auth-info.type";
 import {BalanceType} from "./types/router/balance.type";
 import {HttpUtilsResultType} from "./types/http/http-utils.type";
 import {DefaultErrorResponseType} from "./types/http/default-error-respponse.type";
+import {CustomModal} from "./services/modal";
 
 export class Router {
     readonly titlePageElement: HTMLElement | null;
@@ -27,11 +28,10 @@ export class Router {
     private balanceElement: HTMLElement | null;
     private balanceElementMenu: HTMLElement | null;
     private balanceLink: HTMLElement | null;
-    private confirmBalanceBtn: HTMLElement | null;
-    private cancelBalanceBtn: HTMLElement | null;
-    private balanceInput: HTMLInputElement | null;
+    // private confirmBalanceBtn: HTMLButtonElement | null;
+   // private cancelBalanceBtn: HTMLElement | null;
+   //  private inputElement: HTMLInputElement | null;
     readonly routes: RouteType[];
-    private modal: Modal | null = null;
 
     constructor() {
         this.initEvents();
@@ -42,9 +42,9 @@ export class Router {
         this.balanceElement = null;
         this.balanceElementMenu = null;
         this.balanceLink = null;
-        this.confirmBalanceBtn = null;
-        this.cancelBalanceBtn = null;
-        this.balanceInput = null;
+        // this.confirmBalanceBtn = null;
+        //this.cancelBalanceBtn = null;
+        // this.inputElement = null;
         this.routes = [
             {
                 name: 'content',
@@ -299,14 +299,13 @@ export class Router {
                             this.balanceElement = document.getElementById('balance');
                             this.balanceElementMenu = document.getElementById('balance-menu');
                             this.balanceLink = document.getElementById("balance-link");
-                            this.confirmBalanceBtn = document.getElementById("confirm-balance-btn");
-                            this.cancelBalanceBtn = document.getElementById("cancel-balance-btn");
-                            this.balanceInput = document.getElementById("edit-balance") as HTMLInputElement;
+                            // this.confirmBalanceBtn = document.getElementById("confirm-balance-btn") as HTMLButtonElement;
+                            // this.cancelBalanceBtn = document.getElementById("cancel-balance-btn");
+                            // this.inputElement = document.getElementById('edit-balance') as HTMLInputElement;
 
                             //вставляем имя пользователя
                             //поля могут быть null, получаем ошибки
-                            if(!this.profileNameElement || !this.profileNameElementMenu || !this.balanceLink
-                            || !this.cancelBalanceBtn ||!this.confirmBalanceBtn) {
+                            if(!this.profileNameElement || !this.profileNameElementMenu || !this.balanceLink) {
                                 if(oldRoute === '/'){
                                     return;
                                 } else {
@@ -327,27 +326,33 @@ export class Router {
                             }
                             await this.showBalance();
 
-                            if(!this.modal) {
-                                this.modal = new Modal('#balanceModal');
-                            }
+                            const balanceLink: HTMLElement | null = document.getElementById('balance-link');
+                            (balanceLink as HTMLAnchorElement).addEventListener('click', () => {
+                                const modal: CustomModal = new CustomModal(this.openNewRoute.bind(this));
+                                modal.open();
+                            });
+
+                            // if(!this.modal) {
+                            //     this.modal = new Modal('#balanceModal');
+                            // }
 
                             //открываем модальное окно при нажатии на ссылку "Баланс"
-                            this.balanceLink.addEventListener("click", () => {
-                                if(this.modal) {
-                                    this.modal.show();
-                                }
-                            });
-                            //закрываем модальное окно при нажатии на кнопку "Отменить"
-                            this.cancelBalanceBtn.addEventListener("click", () => {
-                                if(this.balanceInput){
-                                    this.balanceInput.value = ''; // Сбросить значение инпута
-                                }
-                                if(this.modal) {
-                                    this.modal.hide();
-                                }
-                            });
-                            //обновляем баланс
-                            this.confirmBalanceBtn.addEventListener('click', this.editBalance.bind(this));
+                            // this.balanceLink.addEventListener("click", () => {
+                            //     if(this.modal) {
+                            //         this.modal.show();
+                            //     }
+                            // });
+                            // //закрываем модальное окно при нажатии на кнопку "Отменить"
+                            // this.cancelBalanceBtn.addEventListener("click", () => {
+                            //     if(this.balanceInput){
+                            //         this.balanceInput.value = ''; // Сбросить значение инпута
+                            //     }
+                            //     if(this.modal) {
+                            //         this.modal.hide();
+                            //     }
+                            // });
+                            // //обновляем баланс
+                            // (this.confirmBalanceBtn as HTMLButtonElement).addEventListener('click', this.editBalance.bind(this));
                         }
                         this.activateMenuItem(newRoute); //подсвечиваем активные ссылки
                         contentBlock = document.getElementById('content-layout');
@@ -403,57 +408,23 @@ export class Router {
                 }
             }
         }
-
-        // Инициализация модального окна
-        // if (!this.modal) {
-        //     this.modal = new Modal('#balanceModal');
-        //     console.log('Modal initialized:', this.modal);
-        // }
-        //
-        // // События для модального окна
-        // (this.balanceLink as HTMLElement).addEventListener("click", () => {
-        //     if (this.modal) {
-        //         this.modal.show();
-        //         console.log('Modal shown');
-        //     }
-        // });
-        //
-        // (this.cancelBalanceBtn as HTMLElement).addEventListener("click", () => {
-        //     if (this.balanceInput) {
-        //         this.balanceInput.value = ''; // Сбросить значение инпута
-        //     }
-        //     if (this.modal) {
-        //         this.modal.hide();
-        //         console.log('Modal hidden');
-        //     }
-        // });
-        //
-        // (this.confirmBalanceBtn as HTMLElement).addEventListener('click', this.editBalance.bind(this));
-        //
-        // // Очистка событий для выпадающих меню
-        // document.querySelectorAll('.dropdown-toggle').forEach(el => {
-        //     el.removeEventListener('click', this.dropdownClickHandler);
-        // });
     }
 
-    private async editBalance(): Promise<void> {
-        const newBalance: string | undefined = this.balanceInput?.value;
-        const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance', 'PUT', true, {
-            newBalance
-        });
-        if(this.modal) {
-            this.modal.hide();
-        }
-        if (result.redirect) {
-            return this.openNewRoute(result.redirect);
-        }
-        const response: DefaultErrorResponseType | BalanceType | null = result.response;
-        if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
-            return alert('Возникла ошибка при обновлении баланса');
-        }
-        if (response && 'balance' in response && this.balanceElement && this.balanceElementMenu) {
-            this.balanceElement.innerText = String(response.balance);
-            this.balanceElementMenu.innerText = String(response.balance);
-        }
-    }
+    // private async editBalance(): Promise<void> {
+    //     const newBalance: string | undefined = this.inputElement?.value;
+    //     const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance', 'PUT', true, {
+    //         newBalance
+    //     });
+    //
+    //     if (result.redirect) {
+    //         return this.openNewRoute(result.redirect);
+    //     }
+    //     const response: DefaultErrorResponseType | BalanceType | null = result.response;
+    //     if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
+    //         return alert('Возникла ошибка при обновлении баланса');
+    //     }
+    //     if (response && 'balance' in response && this.inputElement) {
+    //         this.inputElement.innerText = String(response.balance);
+    //     }
+    // }
 }
