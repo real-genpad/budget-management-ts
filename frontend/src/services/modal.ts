@@ -6,6 +6,7 @@ import {DefaultErrorResponseType} from "../types/http/default-error-respponse.ty
 
 export class CustomModal {
     readonly openNewRoute: OpenRouteType;
+    private balanceElement: HTMLElement
     private modalElement: HTMLElement;
     readonly inputElement: HTMLInputElement;
     private confirmButton: HTMLButtonElement;
@@ -15,6 +16,7 @@ export class CustomModal {
 
     constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
+        this.balanceElement = document.getElementById('balance') as HTMLElement;
         this.modalElement = document.getElementById('customModal') as HTMLElement;
         this.inputElement = document.getElementById('edit-balance') as HTMLInputElement;
         this.confirmButton = document.getElementById('confirm-balance-btn') as HTMLButtonElement;
@@ -22,7 +24,15 @@ export class CustomModal {
         this.bodyElement = document.querySelector('body') as HTMLBodyElement;
 
 
-        this.addEventListeners();
+        this.confirmButton.addEventListener('click', () => {
+            this.editBalance();
+            this.closeModal();
+        });
+
+        this.cancelButton.addEventListener('click', () => {
+            this.closeModal();
+        });
+        // this.addEventListeners();
     }
 
     public open() {
@@ -33,16 +43,16 @@ export class CustomModal {
         this.createBackdrop();
     }
 
-    private addEventListeners() {
-        this.confirmButton.addEventListener('click', () => {
-            this.editBalance();
-            this.closeModal();
-        });
-
-        this.cancelButton.addEventListener('click', () => {
-            this.closeModal();
-        });
-    }
+    // private addEventListeners() {
+    //     this.confirmButton.addEventListener('click', () => {
+    //         this.editBalance();
+    //         this.closeModal();
+    //     });
+    //
+    //     this.cancelButton.addEventListener('click', () => {
+    //         this.closeModal();
+    //     });
+    // }
 
     private closeModal() {
         this.modalElement.classList.remove('show');
@@ -78,7 +88,7 @@ export class CustomModal {
             return alert('Возникла ошибка при обновлении баланса');
         }
         if (response && 'balance' in response && this.inputElement) {
-            this.inputElement.innerText = String(response.balance);
+            this.balanceElement.innerText = String(response.balance);
         }
     }
 }
