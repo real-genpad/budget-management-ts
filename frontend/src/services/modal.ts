@@ -10,6 +10,8 @@ export class CustomModal {
     readonly inputElement: HTMLInputElement;
     private confirmButton: HTMLButtonElement;
     private cancelButton: HTMLButtonElement;
+    private bodyElement: HTMLBodyElement;
+    private modalBackdrop!: HTMLElement;
 
     constructor(openNewRoute: OpenRouteType) {
         this.openNewRoute = openNewRoute;
@@ -17,12 +19,18 @@ export class CustomModal {
         this.inputElement = document.getElementById('edit-balance') as HTMLInputElement;
         this.confirmButton = document.getElementById('confirm-balance-btn') as HTMLButtonElement;
         this.cancelButton = document.getElementById('cancel-balance-btn') as HTMLButtonElement;
+        this.bodyElement = document.querySelector('body') as HTMLBodyElement;
+
 
         this.addEventListeners();
     }
 
     public open() {
+        this.modalElement.classList.add('show');
         this.modalElement.style.display = 'block';
+        this.bodyElement.style.overflow = 'hidden';
+        this.bodyElement.style.paddingRight = '17px';
+        this.createBackdrop();
     }
 
     private addEventListeners() {
@@ -37,7 +45,23 @@ export class CustomModal {
     }
 
     private closeModal() {
-        this.modalElement.style.display = 'none';
+        this.modalElement.classList.remove('show');
+        this.modalElement.style.display = '';
+        this.bodyElement.style.overflow = '';
+        this.bodyElement.style.paddingRight = '';
+        this.removeBackdrop();
+    }
+
+    private createBackdrop(): void {
+        this.modalBackdrop = document.createElement('div');
+        this.modalBackdrop.className = 'modal-backdrop fade';
+        this.bodyElement.appendChild(this.modalBackdrop);
+        this.modalBackdrop.classList.add('show');
+    }
+
+    private removeBackdrop(): void {
+        this.modalBackdrop.classList.remove('show');
+        this.modalBackdrop.remove();
     }
 
     private async editBalance(): Promise<void> {
