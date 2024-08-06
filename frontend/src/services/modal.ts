@@ -32,7 +32,6 @@ export class CustomModal {
         this.cancelButton.addEventListener('click', () => {
             this.closeModal();
         });
-        // this.addEventListeners();
     }
 
     public open() {
@@ -42,17 +41,6 @@ export class CustomModal {
         this.bodyElement.style.paddingRight = '17px';
         this.createBackdrop();
     }
-
-    // private addEventListeners() {
-    //     this.confirmButton.addEventListener('click', () => {
-    //         this.editBalance();
-    //         this.closeModal();
-    //     });
-    //
-    //     this.cancelButton.addEventListener('click', () => {
-    //         this.closeModal();
-    //     });
-    // }
 
     private closeModal() {
         this.modalElement.classList.remove('show');

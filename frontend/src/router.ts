@@ -12,7 +12,6 @@ import {CreateCategory} from "./components/category/create-category";
 import {Category} from "./components/category/category";
 import {EditCategory} from "./components/category/edit-category";
 import {DeleteCategory} from "./components/category/delete-category";
-import {Modal} from 'bootstrap';
 import {RouteType} from "./types/router/route.type";
 import {AuthInfoType} from "./types/auth/auth-info.type";
 import {BalanceType} from "./types/router/balance.type";
@@ -28,9 +27,6 @@ export class Router {
     private balanceElement: HTMLElement | null;
     private balanceElementMenu: HTMLElement | null;
     private balanceLink: HTMLElement | null;
-    // private confirmBalanceBtn: HTMLButtonElement | null;
-   // private cancelBalanceBtn: HTMLElement | null;
-   //  private inputElement: HTMLInputElement | null;
     readonly routes: RouteType[];
 
     constructor() {
@@ -299,9 +295,6 @@ export class Router {
                             this.balanceElement = document.getElementById('balance');
                             this.balanceElementMenu = document.getElementById('balance-menu');
                             this.balanceLink = document.getElementById("balance-link");
-                            // this.confirmBalanceBtn = document.getElementById("confirm-balance-btn") as HTMLButtonElement;
-                            // this.cancelBalanceBtn = document.getElementById("cancel-balance-btn");
-                            // this.inputElement = document.getElementById('edit-balance') as HTMLInputElement;
 
                             //вставляем имя пользователя
                             //поля могут быть null, получаем ошибки
@@ -327,32 +320,11 @@ export class Router {
                             await this.showBalance();
 
                             const balanceLink: HTMLElement | null = document.getElementById('balance-link');
-                            (balanceLink as HTMLAnchorElement).addEventListener('click', () => {
+                            (balanceLink as HTMLElement).addEventListener('click', () => {
                                 const modal: CustomModal = new CustomModal(this.openNewRoute.bind(this));
                                 modal.open();
                             });
 
-                            // if(!this.modal) {
-                            //     this.modal = new Modal('#balanceModal');
-                            // }
-
-                            //открываем модальное окно при нажатии на ссылку "Баланс"
-                            // this.balanceLink.addEventListener("click", () => {
-                            //     if(this.modal) {
-                            //         this.modal.show();
-                            //     }
-                            // });
-                            // //закрываем модальное окно при нажатии на кнопку "Отменить"
-                            // this.cancelBalanceBtn.addEventListener("click", () => {
-                            //     if(this.balanceInput){
-                            //         this.balanceInput.value = ''; // Сбросить значение инпута
-                            //     }
-                            //     if(this.modal) {
-                            //         this.modal.hide();
-                            //     }
-                            // });
-                            // //обновляем баланс
-                            // (this.confirmBalanceBtn as HTMLButtonElement).addEventListener('click', this.editBalance.bind(this));
                         }
                         this.activateMenuItem(newRoute); //подсвечиваем активные ссылки
                         contentBlock = document.getElementById('content-layout');
@@ -364,9 +336,9 @@ export class Router {
                     }
                 }
 
-                if (newRoute.load && typeof newRoute.load === 'function') {
-                    newRoute.load();
-                }
+            }
+            if (newRoute.load && typeof newRoute.load === 'function') {
+                newRoute.load();
             }
         } else {
             console.log('requested route was not found');
@@ -409,22 +381,4 @@ export class Router {
             }
         }
     }
-
-    // private async editBalance(): Promise<void> {
-    //     const newBalance: string | undefined = this.inputElement?.value;
-    //     const result: HttpUtilsResultType<BalanceType> = await HttpUtils.request('/balance', 'PUT', true, {
-    //         newBalance
-    //     });
-    //
-    //     if (result.redirect) {
-    //         return this.openNewRoute(result.redirect);
-    //     }
-    //     const response: DefaultErrorResponseType | BalanceType | null = result.response;
-    //     if (result.error || !response || (response && (response as DefaultErrorResponseType).error)) {
-    //         return alert('Возникла ошибка при обновлении баланса');
-    //     }
-    //     if (response && 'balance' in response && this.inputElement) {
-    //         this.inputElement.innerText = String(response.balance);
-    //     }
-    // }
 }
